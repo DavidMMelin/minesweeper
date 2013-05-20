@@ -1,5 +1,5 @@
 class Minesweeper
-  attr_accessor :size, :answer_board, :user_board
+  attr_accessor :size, :answer_board, :user_board, :bomb_positions
 
   def initialize(size = 9)
     @size = size
@@ -9,14 +9,17 @@ class Minesweeper
   end
 
   def play_game
-    until game_over?
+    until winner?
       display_board(@user_board)
       get_move
     end
   end
 
-  def game_over?
-    false
+  def winner?
+    @bomb_positions.each do |position|
+      return false if @user_board[position[0]][position[1]] != 'F'
+    end
+    true
   end
 
   def display_board(board)
@@ -53,7 +56,11 @@ class Minesweeper
         @user_board[row][column] = "F"
       end
     when "B"
-      raise "YouBlewUpError"
+      if action == "F"
+        @user_board[row][column] = "F"
+      else
+        raise "YouBlewUpError"
+      end
     end
   end
 
@@ -63,26 +70,21 @@ class Minesweeper
 
   end
 
-  def update_board
-    #use tree to open up all empty spaces if blank space
-    #put 1, 2, 3 on non-bomb spaces
-  end
-
   def make_board
     board = Array.new(@size){Array.new(@size) {'*'} }
   end
 
   def create_answer_board
     @answer_board = make_board
-    bomb_positions = []
+    @bomb_positions = []
     while bomb_positions.size < @total_bombs
       rand_row = rand(@size)
       rand_col = rand(@size)
-      bomb_positions << [rand_row, rand_col]
-      bomb_positions.uniq!
+      @bomb_positions << [rand_row, rand_col]
+      @bomb_positions.uniq!
     end
 
-    bomb_positions.each do |bomb|
+    @bomb_positions.each do |bomb|
       @answer_board[bomb[0]][bomb[-1]] = "B"
     end
 
