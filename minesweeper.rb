@@ -14,8 +14,9 @@ class Minesweeper
     until winner?
       display_board(@user_board)
       get_move
-      # places move
     end
+    display_board(@user_board)
+    puts "CONGRATS, YOU WON!"
   end
 
   def winner? #compare flag positions with our bomb positions || count flags and positions
@@ -28,7 +29,10 @@ class Minesweeper
 
   def display_board(board) # change way info is stored in userboard, use that info to display
     board.each do |row|    # ex: :flag = 'F'
-      p row
+      row.each do |val|
+        print " #{val} "
+      end
+      puts ""
     end
   end
 
@@ -54,9 +58,10 @@ class Minesweeper
   def place_move(move, action)
     row, column = move[0], move[1]
     case @answer_board[row][column]
-    when "*"
+    when "_"
       if action == "D"
-        @user_board[row][column] = "_" #discover call
+        discover(move)
+        # @user_board[row][column] = "_" #discover call
       elsif action == "F"
         @user_board[row][column] = "F"
       end
@@ -75,12 +80,35 @@ class Minesweeper
     end
   end
 
+  def discover(move, valid_neighbors = [])
+    row, col = move[0],move[1]
+    if @answer_board[row][col].class == Fixnum
+      @user_board[row][col] = @answer_board[row][col]
+    else
+      @user_board[row][col] = @answer_board[row][col]
+      find_valid_neighbors(move).each do |cell|
+        discover(cell, find_valid_neighbors(cell))
+      end
+    end
+  end
+
+  def find_valid_neighbors(move)
+    valid_neighbors = []
+    SURROUNDING_CELLS.each do |position|
+      neighbor_cell = [move[0] + position[0], move[1] + position[1]]
+      if valid_cell?(neighbor_cell) && @user_board[neighbor_cell[0]][neighbor_cell[1]] != "_"
+        valid_neighbors << neighbor_cell
+      end
+    end
+    valid_neighbors
+  end
+
   def make_board
     board = Array.new(@size) { Array.new(@size) { '*' } }
   end
 
   def create_answer_board
-    @answer_board = make_board
+    @answer_board = Array.new(@size) { Array.new(@size) { '_' } }
     @bomb_positions = []
     while bomb_positions.size < @total_bombs
       rand_row = rand(@size)
@@ -96,14 +124,7 @@ class Minesweeper
     @answer_board
   end
 
-  # SURROUNDING_CELLS = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
-
   def tally_bombs
-    # each position in answer board
-      # skip if bomb
-      # get surrounding cells
-      # count the number of bombs in above
-      # put into answer key
 
     @answer_board.each_with_index do |row, r_idx|
       row.each_with_index do |value, c_idx|
