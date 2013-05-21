@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Minesweeper
   attr_accessor :size, :answer_board, :user_board, :bomb_positions
   SURROUNDING_CELLS = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]]
@@ -12,11 +14,22 @@ class Minesweeper
 
   def play_game
     until winner?
+      save_game
       display_board(@user_board)
       get_move
+      #loser?
     end
     display_board(@user_board)
     puts "CONGRATS, YOU WON!"
+  end
+
+  def save_game
+    print "Would you like to save? (y or n): "
+    response = gets.chomp
+    if response == 'y'
+      game_to_save = self.to_yaml
+      File.open(Dir.pwd, 'w+') {|f| f.write(game_to_save) }
+    end
   end
 
   def winner? #compare flag positions with our bomb positions || count flags and positions
@@ -61,7 +74,6 @@ class Minesweeper
     when "_"
       if action == "D"
         discover(move)
-        # @user_board[row][column] = "_" #discover call
       elsif action == "F"
         @user_board[row][column] = "F"
       end
@@ -120,12 +132,10 @@ class Minesweeper
     @bomb_positions.each do |bomb|
       @answer_board[bomb[0]][bomb[1]] = "B"
     end
-
     @answer_board
   end
 
   def tally_bombs
-
     @answer_board.each_with_index do |row, r_idx|
       row.each_with_index do |value, c_idx|
         next if @answer_board[r_idx][c_idx] == "B"
@@ -139,7 +149,6 @@ class Minesweeper
         @answer_board[r_idx][c_idx] = bomb_tally unless bomb_tally == 0
       end
     end
-
   end
 
   def increase_bomb_tally(neighbor_cell)
@@ -151,18 +160,11 @@ class Minesweeper
   end
 
   def valid_cell?(neighbor)
-    neighbor[0].between?(0,8) && neighbor[1].between?(0, 8)
+    neighbor[0].between?(0,@size - 1) && neighbor[1].between?(0, @size - 1)
   end
-
 end
 
-game = Minesweeper.new
+game = Minesweeper.new(16)
 game.display_board(game.answer_board)
 puts " "
 game.play_game
-# p game.user_board
-
-
-# p game.answer_board
-# p game.total_bombs
-#p game.answer_board
