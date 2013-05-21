@@ -24,6 +24,8 @@ class Minesweeper
     puts "CONGRATS, YOU WON!"
   end
 
+  protected
+
   def save_game
     print "Would you like to save? (y or n): "
     response = gets.chomp
@@ -38,7 +40,7 @@ class Minesweeper
     print "Would you like to load a saved game? (y or n): "
     response = gets.chomp
     if response == 'y'
-      saved_game = YAML::load(File.read("../minesweepersaved.rb"))
+      saved_game = YAML::load(File.read("minesweepersaved.rb"))
       saved_game.play_game
     end
   end
@@ -176,6 +178,6 @@ class Minesweeper
 end
 
 game = Minesweeper.new(16)
-game.display_board(game.answer_board)
+# game.display_board(game.answer_board)
 puts " "
 game.play_game
