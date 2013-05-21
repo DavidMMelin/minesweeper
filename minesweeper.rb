@@ -29,7 +29,7 @@ class Minesweeper
     response = gets.chomp
     if response == 'y'
       game_to_save = self.to_yaml
-      File.open(Dir.pwd + "saved.rb", 'w+') {|f| f.write(game_to_save) }
+      File.open(Dir.pwd + "/minesweeper" + "saved.rb", 'w+') {|f| f.write(game_to_save) }
       raise "GameSaved"
     end
   end
