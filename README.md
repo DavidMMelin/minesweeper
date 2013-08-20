@@ -4,5 +4,5 @@ Minesweeper
 
 ###Play until you get tired, save, then come back and play again!
 
-####Brought to you by Belda and David
+####Brought to you by Dave M!
 
